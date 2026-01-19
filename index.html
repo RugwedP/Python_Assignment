@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>S3 File Manager</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-5">
+    <h2>S3 Manager: {{ current_path or 'Root' }}</h2>
+    
+    <form action="/upload" method="post" enctype="multipart/form-data" class="mb-4">
+        <input type="hidden" name="path" value="{{ current_path }}">
+        <input type="file" name="file">
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr><th>Name</th><th>Size (Bytes)</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            {% for folder in folders %}
+            <tr>
+                <td><a href="/?prefix={{ folder.Prefix }}">📁 {{ folder.Prefix }}</a></td>
+                <td>-</td>
+                <td><a href="/delete/{{ folder.Prefix }}" class="text-danger">Delete</a></td>
+            </tr>
+            {% endfor %}
+            {% for file in files %}
+            <tr>
+                <td>📄 {{ file.Key }}</td>
+                <td>{{ file.Size }}</td>
+                <td><a href="/delete/{{ file.Key }}" class="text-danger">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
