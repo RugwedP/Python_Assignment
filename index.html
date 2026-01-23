@@ -3,36 +3,540 @@
 <head>
     <title>S3 File Manager</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --sidebar-bg: #1f2937;
+            --hover-bg: #f3f4f6;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 20px;
+            z-index: 1000;
+        }
+        
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-nav a {
+            color: #9ca3af;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            display: block;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: #374151;
+            color: white;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+        
+        .top-bar {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .upload-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: #f9fafb;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+        
+        .file-table-container {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        
+        .table {
+            margin: 0;
+        }
+        
+        .table thead {
+            background: #f9fafb;
+        }
+        
+        .table th {
+            border: none;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .table td {
+            padding: 1rem 2rem;
+            vertical-align: middle;
+            border-top: 1px solid #f3f4f6;
+        }
+        
+        .table tbody tr {
+            transition: background 0.2s;
+        }
+        
+        .table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+        
+        .file-icon {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+            color: #fbbf24;
+        }
+        
+        .folder-icon {
+            color: #60a5fa;
+        }
+        
+        .file-name {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        .file-name a {
+            color: #111827;
+            text-decoration: none;
+        }
+        
+        .file-name a:hover {
+            color: var(--primary-color);
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-download {
+            background: #e0e7ff;
+            color: var(--primary-color);
+        }
+        
+        .btn-download:hover {
+            background: #c7d2fe;
+        }
+        
+        .btn-delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .btn-delete:hover {
+            background: #fecaca;
+        }
+        
+        .btn-upload {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-upload:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .storage-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .storage-bar {
+            background: rgba(255,255,255,0.3);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .storage-fill {
+            background: white;
+            height: 100%;
+            width: 65%;
+            border-radius: 4px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #9ca3af;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
-<body class="container mt-5">
-    <h2>S3 Manager: {{ current_path or 'Root' }}</h2>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-cloud"></i> S3 Manager
+        </div>
+        
+        <div class="storage-info">
+            <div style="font-size: 0.875rem; opacity: 0.9;">Storage Used</div>
+            <div style="font-size: 1.5rem; font-weight: 700; margin-top: 0.25rem;">6.5 GB / 10 GB</div>
+            <div class="storage-bar">
+                <div class="storage-fill"></div>
+            </div>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li><a href="/" class="active"><i class="fas fa-folder"></i> All Files</a></li>
+            <li><a href="/?filter=recent"><i class="fas fa-clock"></i> Recent</a></li>
+            <li><a href="/?filter=images"><i class="fas fa-image"></i> Images</a></li>
+            <li><a href="/?filter=documents"><i class="fas fa-file-alt"></i> Documents</a></li>
+            <li><a href="/?filter=trash"><i class="fas fa-trash"></i> Trash</a></li>
+        </ul>
+        
+        <div style="position: absolute; bottom: 20px; left: 20px; right: 20px;">
+            <a href="/settings" style="color: #9ca3af; text-decoration: none; display: block; padding: 0.75rem;">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+        </div>
+    </div>
     
-    <form action="/upload" method="post" enctype="multipart/form-data" class="mb-4">
-        <input type="hidden" name="path" value="{{ current_path }}">
-        <input type="file" name="file">
-        <button type="submit" class="btn btn-primary">Upload</button>
-    </form>
-
-    <table class="table">
-        <thead>
-            <tr><th>Name</th><th>Size (Bytes)</th><th>Actions</th></tr>
-        </thead>
-        <tbody>
-            {% for folder in folders %}
-            <tr>
-                <td><a href="/?prefix={{ folder.Prefix }}">📁 {{ folder.Prefix }}</a></td>
-                <td>-</td>
-                <td><a href="/delete/{{ folder.Prefix }}" class="text-danger">Delete</a></td>
-            </tr>
-            {% endfor %}
-            {% for file in files %}
-            <tr>
-                <td>📄 {{ file.Key }}</td>
-                <td>{{ file.Size }}</td>
-                <td><a href="/delete/{{ file.Key }}" class="text-danger">Delete</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <!-- <div class="top-bar"> -->
+            <!-- <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                    <li class="breadcrumb-item active">{{ current_path or 'Root' }}</li>
+                </ol>
+            </nav> -->
+            <!-- <div>
+                <button class="btn btn-outline-secondary btn-sm me-2">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div> -->
+        
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="path" value="{{ current_path }}">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h5>Drag and drop files here</h5>
+                    <p class="text-muted mb-3">or click to browse</p>
+                    <input type="file" name="file" id="fileInput" style="display: none;">
+                    <button type="submit" class="btn-upload">
+                        <i class="fas fa-upload me-2"></i>Upload File
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- File Table -->
+        <div class="file-table-container">
+            <div class="table-header">
+                <h5 class="mb-0">Files & Folders</h5>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search files...">
+                </div>
+            </div>
+            
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>Modified</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Folders -->
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <i class="fas fa-folder file-icon folder-icon"></i>
+                                <a href="/?prefix=Documents/">Documents</a>
+                            </div>
+                        </td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">Jan 20, 2026</td>
+                        <td>
+                            <button class="action-btn btn-delete" onclick="return confirm('Delete this folder?')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <i class="fas fa-folder file-icon folder-icon"></i>
+                                <a href="/?prefix=Images/">Images</a>
+                            </div>
+                        </td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">Jan 18, 2026</td>
+                        <td>
+                            <button class="action-btn btn-delete" onclick="return confirm('Delete this folder?')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <i class="fas fa-folder file-icon folder-icon"></i>
+                                <a href="/?prefix=Projects/">Projects</a>
+                            </div>
+                        </td>
+                        <td class="text-muted">—</td>
+                        <td class="text-muted">Jan 15, 2026</td>
+                        <td>
+                            <button class="action-btn btn-delete" onclick="return confirm('Delete this folder?')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <!-- Files -->
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <i class="fas fa-file-pdf file-icon" style="color: #ef4444;"></i>
+                                Annual_Report_2025.pdf
+                            </div>
+                        </td>
+                        <td class="text-muted">2,456,789 bytes</td>
+                        <td class="text-muted">Jan 22, 2026</td>
+                        <td>
+                            <button class="action-btn btn-download">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="action-btn btn-delete" onclick="return confirm('Delete this file?')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <i class="fas fa-file-excel file-icon" style="color: #10b981;"></i>
+                                Budget_Q1_2026.xlsx
+                            </div>
+                        </td>
+                        <td class="text-muted">1,234,567 bytes</td>
+                        <td class="text-muted">Jan 21, 2026</td>
+                        <td>
+                            <button class="action-btn btn-download">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="action-btn btn-delete" onclick="return confirm('Delete this file?')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <i class="fas fa-file-word file-icon" style="color: #3b82f6;"></i>
+                                Meeting_Notes.docx
+                            </div>
+                        </td>
+                        <td class="text-muted">456,123 bytes</td>
+                        <td class="text-muted">Jan 20, 2026</td>
+                        <td>
+                            <button class="action-btn btn-download">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="action-btn btn-delete" onclick="return confirm('Delete this file?')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <i class="fas fa-file-image file-icon" style="color: #8b5cf6;"></i>
+                                company_logo.png
+                            </div>
+                        </td>
+                        <td class="text-muted">89,456 bytes</td>
+                        <td class="text-muted">Jan 19, 2026</td>
+                        <td>
+                            <button class="action-btn btn-download">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="action-btn btn-delete" onclick="return confirm('Delete this file?')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <i class="fas fa-file-archive file-icon" style="color: #f59e0b;"></i>
+                                backup_2026.zip
+                            </div>
+                        </td>
+                        <td class="text-muted">15,678,900 bytes</td>
+                        <td class="text-muted">Jan 18, 2026</td>
+                        <td>
+                            <button class="action-btn btn-download">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="action-btn btn-delete" onclick="return confirm('Delete this file?')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <i class="fas fa-file-code file-icon" style="color: #06b6d4;"></i>
+                                script.js
+                            </div>
+                        </td>
+                        <td class="text-muted">12,345 bytes</td>
+                        <td class="text-muted">Jan 17, 2026</td>
+                        <td>
+                            <button class="action-btn btn-download">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="action-btn btn-delete" onclick="return confirm('Delete this file?')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
